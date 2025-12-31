@@ -1,0 +1,6 @@
+id=thermal_fix
+name=Pixel 10 Pro Thermal Fix
+version=v1.0
+versionCode=1
+author=Gemini
+description=Fixes the 5-minute thermal polling bug and adds a 65C safety clamp.
