@@ -1,0 +1,650 @@
+{
+    "Include": [
+        "thermal_info_config_throttling.json",
+        "thermal_info_config_charge.json",
+        "thermal_info_config_stats.json"
+    ],
+    "Sensors": [
+        {
+            "Name": "VIRTUAL-SKIN-PREDICTION-MODEL",
+            "Type": "UNKNOWN",
+            "VirtualSensor": true,
+            "ModelPath": "future_vt_prediction_model.tflite",
+            "Formula": "USE_ML_MODEL",
+            "Combination": [
+                "north_therm",
+                "flash_therm",
+                "soc_therm",
+                "rfpa_therm",
+                "charging_therm",
+                "disp0_therm",
+                "usb_pwr_therm",
+                "quiet_therm",
+                "VIRTUAL-SKIN"
+            ],
+            "PreviousSampleCount": 11,
+            "OutputLabelCount": 10,
+            "Multiplier": 0.001,
+            "SupportUnderSampling": true,
+            "SupportPrediction": true,
+            "SampleDuration": 7000,
+            "TimeResolution": 7000
+        },
+        {
+            "Name": "VIRTUAL-SKIN-SPEAKER-SUB-0",
+            "Type": "UNKNOWN",
+            "Hidden": true,
+            "VirtualSensor": true,
+            "Formula": "WEIGHTED_AVG",
+            "Combination": [
+                "north_therm",
+                "flash_therm",
+                "soc_therm",
+                "rfpa_therm",
+                "charging_therm",
+                "quiet_therm",
+                "disp0_therm",
+                "usb_pwr_therm"
+            ],
+            "Coefficient": [
+                0.101,
+                0.097,
+                0.108,
+                0.106,
+                0.108,
+                0.102,
+                0.091,
+                0.092
+            ],
+            "Offset": 4883.0,
+            "Multiplier": 0.001
+        },
+        {
+            "Name": "VIRTUAL-SKIN-SPEAKER-LEGACY",
+            "Type": "UNKNOWN",
+            "Version": "DVT",
+            "VirtualSensor": true,
+            "Formula": "MAXIMUM",
+            "Combination": [
+                "VIRTUAL-SKIN-SPEAKER-SUB-0"
+            ],
+            "Coefficient": [
+                1.0
+            ],
+            "Multiplier": 0.001
+        },
+        {
+            "Name": "VIRTUAL-SKIN-SPEAKER-MODEL",
+            "Type": "UNKNOWN",
+            "Version": "DVT",
+            "VirtualSensor": true,
+            "ModelPath": "vt_speaker_estimation_model.tflite",
+            "Formula": "USE_ML_MODEL",
+            "Combination": [
+                "charging_therm",
+                "disp0_therm",
+                "flash_therm",
+                "north_therm",
+                "quiet_therm",
+                "rfpa_therm",
+                "soc_therm",
+                "usb_pwr_therm"
+            ],
+            "Multiplier": 0.001,
+            "PreviousSampleCount": 3,
+            "BackupSensor": "VIRTUAL-SKIN-SPEAKER-LEGACY",
+            "TimeResolution": 7000
+        },
+        {
+            "Name": "VIRTUAL-SKIN-SPEAKER-MODEL-UPPER-CLAMPED",
+            "Type": "UNKNOWN",
+            "VirtualSensor": true,
+            "Hidden": true,
+            "Formula": "MINIMUM",
+            "Combination": [
+                "55000",
+                "VIRTUAL-SKIN-SPEAKER-MODEL"
+            ],
+            "CombinationType": [
+                "CONSTANT",
+                "SENSOR"
+            ],
+            "Coefficient": [
+                1.0,
+                1.0
+            ],
+            "Multiplier": 1
+        },
+        {
+            "Name": "VIRTUAL-SKIN-SPEAKER-MODEL-CLAMPED",
+            "Type": "UNKNOWN",
+            "VirtualSensor": true,
+            "Hidden": true,
+            "Formula": "MAXIMUM",
+            "Combination": [
+                "20000",
+                "VIRTUAL-SKIN-SPEAKER-MODEL-UPPER-CLAMPED"
+            ],
+            "CombinationType": [
+                "CONSTANT",
+                "SENSOR"
+            ],
+            "Coefficient": [
+                1.0,
+                1.0
+            ],
+            "Multiplier": 1
+        },
+        {
+            "Name": "VIRTUAL-SKIN-SPEAKER-MODEL-LEGACY-DIFF",
+            "Type": "UNKNOWN",
+            "VirtualSensor": true,
+            "Hidden": true,
+            "Formula": "WEIGHTED_AVG",
+            "Combination": [
+                "VIRTUAL-SKIN-SPEAKER-MODEL",
+                "VIRTUAL-SKIN-SPEAKER-LEGACY"
+            ],
+            "Coefficient": [
+                1.0,
+                -1.0
+            ],
+            "Multiplier": 1
+        },
+        {
+            "Name": "VIRTUAL-SKIN-SPEAKER-LEGACY-MODEL-DIFF",
+            "Type": "UNKNOWN",
+            "VirtualSensor": true,
+            "Hidden": true,
+            "Formula": "WEIGHTED_AVG",
+            "Combination": [
+                "VIRTUAL-SKIN-SPEAKER-LEGACY",
+                "VIRTUAL-SKIN-SPEAKER-MODEL"
+            ],
+            "Coefficient": [
+                1.0,
+                -1.0
+            ],
+            "Multiplier": 1
+        },
+        {
+            "Name": "VT_SPEAKER_LEGACY_WEIGHT",
+            "Type": "UNKNOWN",
+            "Hidden": true,
+            "VirtualSensor": true,
+            "Formula": "COUNT_THRESHOLD",
+            "StepRatio": 0.2,
+            "Combination": [
+                "VIRTUAL-SKIN-SPEAKER-MODEL-LEGACY-DIFF",
+                "VIRTUAL-SKIN-SPEAKER-LEGACY-MODEL-DIFF"
+            ],
+            "Coefficient": [
+                10000,
+                7000
+            ],
+            "Multiplier": 1,
+            "PassiveDelay": 7000
+        },
+        {
+            "Name": "VT_SPEAKER_MODEL_WEIGHT",
+            "Type": "UNKNOWN",
+            "Hidden": true,
+            "VirtualSensor": true,
+            "Formula": "WEIGHTED_AVG",
+            "Combination": [
+                "1",
+                "VT_SPEAKER_LEGACY_WEIGHT"
+            ],
+            "CombinationType": [
+                "CONSTANT",
+                "SENSOR"
+            ],
+            "Coefficient": [
+                1.0,
+                -1.0
+            ],
+            "Multiplier": 1
+        },
+        {
+            "Name": "VIRTUAL-SKIN-SPEAKER",
+            "Type": "UNKNOWN",
+            "Version": "DVT",
+            "VirtualSensor": true,
+            "TriggerSensor": [
+                "north_therm",
+                "flash_therm",
+                "soc_therm",
+                "rfpa_therm",
+                "charging_therm",
+                "disp0_therm"
+            ],
+            "Formula": "WEIGHTED_AVG",
+            "Combination": [
+                "VIRTUAL-SKIN-SPEAKER-LEGACY",
+                "VIRTUAL-SKIN-SPEAKER-MODEL-CLAMPED"
+            ],
+            "Coefficient": [
+                "VT_SPEAKER_LEGACY_WEIGHT",
+                "VT_SPEAKER_MODEL_WEIGHT"
+            ],
+            "CoefficientType": [
+                "SENSOR",
+                "SENSOR"
+            ],
+            "Multiplier": 0.001,
+            "StepRatio": 0.4,
+            "HotThreshold": [
+                "NAN",
+                37.0,
+                "NAN",
+                "NAN",
+                "NAN",
+                "NAN",
+                "NAN"
+            ],
+            "HotHysteresis": [
+                0.0,
+                1.9,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "SendCallback": true,
+            "PollingDelay": 5000,
+            "PassiveDelay": 7000
+        },
+        {
+            "Name": "VIRTUAL-BTS-WINDOW-PARTIAL",
+            "Type": "UNKNOWN",
+            "VirtualSensor": true,
+            "Formula": "WEIGHTED_AVG",
+            "Combination": [
+                "flash_therm"
+            ],
+            "Coefficient": [
+                0.019
+            ],
+            "Offset": 773,
+            "Multiplier": 0.001
+        },
+        {
+            "Name": "VIRTUAL-USB-UI",
+            "Type": "USB_PORT",
+            "VirtualSensor": true,
+            "Formula": "COUNT_THRESHOLD",
+            "TriggerSensor": "usb_pwr_therm",
+            "Combination": [
+                "usb_pwr_therm",
+                "usb_pwr_therm",
+                "USB-MINUS-CHARGING"
+            ],
+            "Coefficient": [
+                59000.0,
+                54000.0,
+                2000.0
+            ],
+            "HotThreshold": [
+                "NaN",
+                "NaN",
+                "NaN",
+                "NaN",
+                "NaN",
+                2.0,
+                "NaN"
+            ],
+            "HotHysteresis": [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.9,
+                0.0
+            ],
+            "PollingDelay": 5000,
+            "PassiveDelay": 7000,
+            "SendCallback": true
+        },
+        {
+            "Name": "cellular-emergency",
+            "Type": "POWER_AMPLIFIER",
+            "VirtualSensor": true,
+            "TriggerSensor": [
+                "north_therm",
+                "charging_therm",
+                "disp0_therm"
+            ],
+            "Formula": "MAXIMUM",
+            "Combination": [
+                "VIRTUAL-SKIN"
+            ],
+            "Coefficient": [
+                1.0
+            ],
+            "HotThreshold": [
+                "NAN",
+                "NAN",
+                "NAN",
+                "NAN",
+                "NAN",
+                54.0,
+                "NAN"
+            ],
+            "HotHysteresis": [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.9,
+                0.0
+            ],
+            "Multiplier": 0.001,
+            "SendCallback": true,
+            "PollingDelay": 5000,
+            "PassiveDelay": 7000
+        },
+        {
+            "Name": "VIRTUAL-SKIN-CPU-LIGHT-ODPM",
+            "Type": "UNKNOWN",
+            "Hidden": true,
+            "VirtualSensor": true,
+            "TriggerSensor": [
+                "north_therm",
+                "charging_therm",
+                "disp0_therm"
+            ],
+            "Formula": "MAXIMUM",
+            "Combination": [
+                "VIRTUAL-SKIN"
+            ],
+            "Coefficient": [
+                1.0
+            ],
+            "HotThreshold": [
+                "NAN",
+                37.0,
+                42.0,
+                48.0,
+                58.0,
+                65.0,
+                75.0
+            ],
+            "HotHysteresis": [
+                0.0,
+                0.0,
+                1.9,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "Multiplier": 0.001,
+            "PollingDelay": 5000,
+            "PassiveDelay": 7000,
+            "PIDInfo": {
+                "K_Po": [
+                    "NAN",
+                    "NAN",
+                    400,
+                    "NAN",
+                    "NAN",
+                    "NAN",
+                    "NAN"
+                ],
+                "K_Pu": [
+                    "NAN",
+                    "NAN",
+                    400,
+                    "NAN",
+                    "NAN",
+                    "NAN",
+                    "NAN"
+                ],
+                "K_I": [
+                    "NAN",
+                    "NAN",
+                    5,
+                    "NAN",
+                    "NAN",
+                    "NAN",
+                    "NAN"
+                ],
+                "K_D": [
+                    "NAN",
+                    "NAN",
+                    0,
+                    "NAN",
+                    "NAN",
+                    "NAN",
+                    "NAN"
+                ],
+                "I_Max": [
+                    "NAN",
+                    "NAN",
+                    2933,
+                    "NAN",
+                    "NAN",
+                    "NAN",
+                    "NAN"
+                ],
+                "S_Power": [
+                    "NAN",
+                    "NAN",
+                    1066,
+                    "NAN",
+                    "NAN",
+                    "NAN",
+                    "NAN"
+                ],
+                "MinAllocPower": [
+                    "NAN",
+                    "NAN",
+                    1066,
+                    "NAN",
+                    "NAN",
+                    "NAN",
+                    "NAN"
+                ],
+                "MaxAllocPower": [
+                    "NAN",
+                    "NAN",
+                    6133,
+                    "NAN",
+                    "NAN",
+                    "NAN",
+                    "NAN"
+                ],
+                "I_Cutoff": [
+                    "NAN",
+                    "NAN",
+                    2,
+                    "NAN",
+                    "NAN",
+                    "NAN",
+                    "NAN"
+                ]
+            },
+            "BindedCdevInfo": [
+                {
+                    "CdevRequest": "cpufreq-cpu0",
+                    "CdevWeightForPID": [
+                        1,
+                        1,
+                        1,
+                        1,
+                        1,
+                        1,
+                        1
+                    ],
+                    "MaxReleaseStep": 1,
+                    "MaxThrottleStep": 2,
+                    "BindedPowerRail": "S4M_VDD_CPU",
+                    "CdevCeilingFrequency": [
+                        2250000,
+                        1800000,
+                        1500000,
+                        1200000,
+                        800000,
+                        400000,
+                        400000
+                    ]
+                },
+                {
+                    "CdevRequest": "cpufreq-cpu2",
+                    "CdevWeightForPID": [
+                        1,
+                        1,
+                        1,
+                        1,
+                        1,
+                        1,
+                        1
+                    ],
+                    "MaxReleaseStep": 1,
+                    "MaxThrottleStep": 2,
+                    "BindedPowerRail": "S3M_VDD_CPU1",
+                    "CdevCeilingFrequency": [
+                        2600000,
+                        2200000,
+                        1800000,
+                        1400000,
+                        1000000,
+                        400000,
+                        400000
+                    ]
+                },
+                {
+                    "CdevRequest": "cpufreq-cpu5",
+                    "CdevWeightForPID": [
+                        1,
+                        1,
+                        1,
+                        1,
+                        1,
+                        1,
+                        1
+                    ],
+                    "MaxReleaseStep": 1,
+                    "MaxThrottleStep": 2,
+                    "BindedPowerRail": "S2M_VDD_CPU2",
+                    "CdevCeilingFrequency": [
+                        2300000,
+                        1800000,
+                        1400000,
+                        1200000,
+                        1000000,
+                        400000,
+                        400000
+                    ]
+                },
+                {
+                    "CdevRequest": "cpufreq-cpu7",
+                    "CdevWeightForPID": [
+                        1,
+                        1,
+                        1,
+                        1,
+                        1,
+                        1,
+                        1
+                    ],
+                    "MaxReleaseStep": 1,
+                    "MaxThrottleStep": 2,
+                    "BindedPowerRail": "S2M_VDD_CPU2",
+                    "CdevCeilingFrequency": [
+                        3024000,
+                        2800000,
+                        2200000,
+                        1500000,
+                        800000,
+                        400000,
+                        400000
+                    ]
+                }
+            ]
+        }
+    ],
+    "Stats": {
+        "Sensors": {
+            "RecordWithThreshold": [
+                {
+                    "Name": "VIRTUAL-SKIN-SPEAKER-MODEL-LEGACY-DIFF",
+                    "LoggingName": "SPEAKER-MODEL-LEGACY-0.5",
+                    "Thresholds": [
+                        -4500,
+                        -4000,
+                        -3500,
+                        -3000,
+                        -2500,
+                        -2000,
+                        -1500,
+                        -1000,
+                        -500,
+                        0,
+                        500,
+                        1000,
+                        1500,
+                        2000,
+                        2500,
+                        3000,
+                        3500,
+                        4000,
+                        4500
+                    ]
+                },
+                {
+                    "Name": "VIRTUAL-SKIN-SPEAKER-MODEL-LEGACY-DIFF",
+                    "LoggingName": "SPEAKER-MODEL-LEGACY-1",
+                    "Thresholds": [
+                        -13000,
+                        -12000,
+                        -11000,
+                        -10000,
+                        -9000,
+                        -8000,
+                        -7000,
+                        -6000,
+                        -5000,
+                        -4000,
+                        4000,
+                        5000,
+                        6000,
+                        7000,
+                        8000,
+                        9000,
+                        10000,
+                        11000,
+                        12000
+                    ]
+                }
+            ],
+            "Abnormality": {
+                "Outlier": {
+                    "Configs": [
+                        {
+                            "Monitor": [
+                                "VIRTUAL-SKIN-SPEAKER-MODEL"
+                            ],
+                            "TempRange": [
+                                0.0,
+                                55.0
+                            ]
+                        },
+                        {
+                            "Monitor": [
+                                "VIRTUAL-SKIN-SPEAKER-MODEL-LEGACY-DIFF"
+                            ],
+                            "TempRange": [
+                                -14000,
+                                14000
+                            ]
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}
