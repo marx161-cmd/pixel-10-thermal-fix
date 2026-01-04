@@ -1,0 +1,19 @@
+{
+    "Include": ["thermal_info_config.json"],
+    "Sensors":[
+        {
+            "Name": "VIRTUAL-SKIN-CHARGE-WIRED",
+            "isDisabled": true
+        },
+        {
+            "Name": "VIRTUAL-SKIN-CHARGE-PERSIST",
+            "isDisabled": true
+        }
+    ],
+    "CoolingDevices":[
+        {
+            "Name":"chg_mdis",
+            "isDisabled": true
+        }
+    ]
+}

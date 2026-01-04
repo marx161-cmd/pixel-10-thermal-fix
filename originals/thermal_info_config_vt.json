@@ -1,0 +1,103 @@
+{
+  "Sensors":[
+    {
+      "Name": "VIRTUAL-SKIN-MODEL-UPPER-CLAMPED",
+      "Type": "UNKNOWN",
+      "VirtualSensor": true,
+      "Hidden": true,
+      "Formula": "MINIMUM",
+      "Combination": ["55000", "VIRTUAL-SKIN-MODEL"],
+      "CombinationType": ["CONSTANT", "SENSOR"],
+      "Coefficient": [1.0, 1.0],
+      "Multiplier": 1
+    },
+    {
+      "Name": "VIRTUAL-SKIN-MODEL-CLAMPED",
+      "Type": "UNKNOWN",
+      "VirtualSensor": true,
+      "Hidden": true,
+      "Formula": "MAXIMUM",
+      "Combination": ["20000", "VIRTUAL-SKIN-MODEL-UPPER-CLAMPED"],
+      "CombinationType": ["CONSTANT", "SENSOR"],
+      "Coefficient": [1.0, 1.0],
+      "Multiplier": 1
+    },
+    {
+      "Name": "VIRTUAL-SKIN-MODEL-LEGACY-DIFF",
+      "Type": "UNKNOWN",
+      "VirtualSensor": true,
+      "Hidden": true,
+      "Formula": "WEIGHTED_AVG",
+      "Combination": ["VIRTUAL-SKIN-MODEL", "VIRTUAL-SKIN-LEGACY"],
+      "Coefficient": [1.0, -1.0],
+      "Multiplier": 1
+    },
+    {
+      "Name": "VIRTUAL-SKIN-LEGACY-MODEL-DIFF",
+      "Type": "UNKNOWN",
+      "VirtualSensor": true,
+      "Hidden": true,
+      "Formula": "WEIGHTED_AVG",
+      "Combination": ["VIRTUAL-SKIN-LEGACY", "VIRTUAL-SKIN-MODEL"],
+      "Coefficient": [1.0, -1.0],
+      "Multiplier": 1
+    },
+    {
+      "Name": "VT_LEGACY_WEIGHT",
+      "Type": "UNKNOWN",
+      "Hidden": true,
+      "VirtualSensor": true,
+      "Formula": "COUNT_THRESHOLD",
+      "StepRatio": 0.2,
+      "Combination": ["VIRTUAL-SKIN-MODEL-LEGACY-DIFF", "VIRTUAL-SKIN-LEGACY-MODEL-DIFF"],
+      "Coefficient": [10000, 7000],
+      "Multiplier": 1,
+      "PassiveDelay": 7000
+    },
+    {
+      "Name": "VT_MODEL_WEIGHT",
+      "Type": "UNKNOWN",
+      "Hidden": true,
+      "VirtualSensor": true,
+      "Formula": "WEIGHTED_AVG",
+      "Combination": ["1", "VT_LEGACY_WEIGHT"],
+      "CombinationType": ["CONSTANT", "SENSOR"],
+      "Coefficient": [1.0, -1.0],
+      "Multiplier": 1
+    },
+    {
+      "Name": "VIRTUAL-SKIN-MODEL-UPDATED",
+      "Type": "UNKNOWN",
+      "VirtualSensor": true,
+      "Hidden": true,
+      "Formula": "WEIGHTED_AVG",
+      "Combination": ["VIRTUAL-SKIN-LEGACY", "VIRTUAL-SKIN-MODEL-CLAMPED"],
+      "Coefficient": ["VT_LEGACY_WEIGHT", "VT_MODEL_WEIGHT"],
+      "CoefficientType": ["SENSOR", "SENSOR"],
+      "Multiplier": 1,
+      "StepRatio": 0.4,
+      "PassiveDelay": 7000
+    },
+    {
+      "Name": "VIRTUAL-SKIN-LEGACY-SHUTDOWN",
+      "Type": "UNKNOWN",
+      "Hidden": true,
+      "VirtualSensor": true,
+      "Formula": "COUNT_THRESHOLD",
+      "Combination": ["VIRTUAL-SKIN-LEGACY"],
+      "Coefficient": [55000],
+      "Multiplier": 1.0
+    },
+    {
+      "Name": "VIRTUAL-SKIN-EQ",
+      "Type": "UNKNOWN",
+      "VirtualSensor": true,
+      "Hidden": true,
+      "Formula": "MAXIMUM",
+      "Combination": ["VIRTUAL-SKIN-MODEL-UPDATED", "VIRTUAL-SKIN-LEGACY"],
+      "Coefficient": [1.0, "VIRTUAL-SKIN-LEGACY-SHUTDOWN"],
+      "CoefficientType":["CONSTANT", "SENSOR"],
+      "Multiplier": 1.0
+    }
+  ]
+}

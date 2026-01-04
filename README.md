@@ -8,10 +8,10 @@ In the stock Android 16 firmware for the Pixel 10 Pro, the `PollingDelay` for cr
 This creates a massive "blind spot" in the system's thermal management. During heavy workloads, the CPU can hit 90°C+ before the Thermal HAL even attempts to sample the temperature, leading to heat soak and potential long-term battery degradation.
 
 ## ✅ The Fix
-This module overlays a corrected `thermal_info_config.json` that:
-1.  **Reduces Polling Delay:** Changes the interval from 300,000ms to **5,000ms** (5s) for real-time response.
-2.  **Enforces Safety Clamp:** Inserts a hard `HotThreshold` at **65°C** (Virtual Skin) to prevent extreme temperatures.
-3.  **Restores Hysteresis:** Optimizes `PassiveDelay` to 7,000ms to prevent erratic CPU frequency oscillations.
+This module overlays the stock thermal configs with focused edits:
+1.  **Reduces Polling Delay:** Sets `PollingDelay` to **5,000ms** for the `VIRTUAL-SKIN*` sensors across `thermal_info_config.json`, `thermal_info_config_throttling.json`, and `thermal_info_config_charge.json`.
+2.  **Keeps OEM thresholds:** Restores the original `HotThreshold`, `CdevCeilingFrequency`, and `Profile` data so only the sampling cadence changes.
+3.  **Retains Hysteresis & Passive Delay:** Keeps the default `PassiveDelay` (7,000ms) and `HotHysteresis` values to avoid oscillating CPU-frequency decisions even as the sensor updates faster.
 
 ---
 
@@ -21,11 +21,19 @@ This module overlays a corrected `thermal_info_config.json` that:
 
 The stock configuration effectively disables real-time thermal management for burst workloads. By the time the 300s timer expires, the device has already reached thermal saturation. This module restores the expected behavior for a flagship Tensor G5 device.
 
+## ✅ Additional Overlays
+* `/vendor/etc/thermal_info_config_throttling.json` and `thermal_info_config_charge.json` inherit the same 5s polling cadence so the HAL cannot revert to the 300s delay through the included files.
+
 ### Verification
 Run the following command in Termux (with root) to verify the fix is active:
 ```bash
 cat /vendor/etc/thermal_info_config.json | grep -A 15 "VIRTUAL-SKIN-CPU-LIGHT-ODPM"
 # Ensure "PollingDelay" is now 5000.
+```
+Verify the included files as well:
+```bash
+cat /vendor/etc/thermal_info_config_throttling.json | rg -n "VIRTUAL-SKIN-CPU-LIGHT-ODPM" -C2
+cat /vendor/etc/thermal_info_config_charge.json | rg -n "PollingDelay" -C1
 ```
 
 🛠 Installation

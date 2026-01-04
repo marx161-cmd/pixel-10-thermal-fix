@@ -365,12 +365,12 @@
             ],
             "HotThreshold": [
                 "NAN",
-                37.0,
-                42.0,
-                48.0,
-                58.0,
-                65.0,
-                75.0
+                36.0,
+                39.0,
+                "NAN",
+                "NAN",
+                "NAN",
+                "NAN"
             ],
             "HotHysteresis": [
                 0.0,
@@ -483,13 +483,13 @@
                     "MaxThrottleStep": 2,
                     "BindedPowerRail": "S4M_VDD_CPU",
                     "CdevCeilingFrequency": [
-                        2250000,
-                        1800000,
-                        1500000,
-                        1200000,
-                        800000,
-                        400000,
-                        400000
+                        2246000,
+                        1632000,
+                        1632000,
+                        1632000,
+                        1632000,
+                        1632000,
+                        1632000
                     ]
                 },
                 {
@@ -507,13 +507,13 @@
                     "MaxThrottleStep": 2,
                     "BindedPowerRail": "S3M_VDD_CPU1",
                     "CdevCeilingFrequency": [
-                        2600000,
-                        2200000,
-                        1800000,
-                        1400000,
-                        1000000,
-                        400000,
-                        400000
+                        3052000,
+                        1785000,
+                        1785000,
+                        1785000,
+                        1785000,
+                        1785000,
+                        1785000
                     ]
                 },
                 {
@@ -531,13 +531,13 @@
                     "MaxThrottleStep": 2,
                     "BindedPowerRail": "S2M_VDD_CPU2",
                     "CdevCeilingFrequency": [
-                        2300000,
-                        1800000,
-                        1400000,
-                        1200000,
-                        1000000,
-                        400000,
-                        400000
+                        3052000,
+                        1785000,
+                        1785000,
+                        1785000,
+                        1785000,
+                        1785000,
+                        1785000
                     ]
                 },
                 {
@@ -555,13 +555,44 @@
                     "MaxThrottleStep": 2,
                     "BindedPowerRail": "S2M_VDD_CPU2",
                     "CdevCeilingFrequency": [
-                        3024000,
-                        2800000,
-                        2200000,
-                        1500000,
-                        800000,
-                        400000,
-                        400000
+                        4012000,
+                        2073000,
+                        2073000,
+                        2073000,
+                        2073000,
+                        2073000,
+                        2073000
+                    ]
+                }
+            ],
+            "Profile": [
+                {
+                    "Mode": "game",
+                    "BindedCdevInfo": [
+                        {
+                            "CdevRequest": "cpufreq-cpu0",
+                            "BindedPowerRail": "S4M_VDD_CPU",
+                            "MaxReleaseStep": 1,
+                            "Disabled": true
+                        },
+                        {
+                            "CdevRequest": "cpufreq-cpu2",
+                            "BindedPowerRail": "S3M_VDD_CPU1",
+                            "MaxReleaseStep": 1,
+                            "Disabled": true
+                        },
+                        {
+                            "CdevRequest": "cpufreq-cpu5",
+                            "BindedPowerRail": "S2M_VDD_CPU2",
+                            "MaxReleaseStep": 1,
+                            "Disabled": true
+                        },
+                        {
+                            "CdevRequest": "cpufreq-cpu7",
+                            "BindedPowerRail": "S2M_VDD_CPU2",
+                            "MaxReleaseStep": 1,
+                            "Disabled": true
+                        }
                     ]
                 }
             ]
