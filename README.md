@@ -1,6 +1,9 @@
 # Pixel 10 Pro Thermal Polling Fix (Android 16)
 
-A surgical Magisk/KernelSU module to correct a 5-minute thermal polling delay found in the initial Android 16 QPR builds for the Pixel 10 Pro.
+## 📢 DISCLAIMER 
+I am very much a hobby dev, and new to rooting android devices. I made this repository to document my findings as I am learning. Please only implement the module if you know what you are doing, and always keep backups in case of something not working as intended.
+ 
+ Asurgical Magisk/KernelSU module to correct a 5-minute thermal polling delay found in the initial Android 16 QPR builds for the Pixel 10 Pro.
 
 ## 🚨 The Issue
 In the stock Android 16 firmware for the Pixel 10 Pro, the `PollingDelay` for critical thermal sensors is incorrectly set to **300,000ms** (5 minutes). 
