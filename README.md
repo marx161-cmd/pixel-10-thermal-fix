@@ -1,5 +1,10 @@
 # Pixel 10 Pro Thermal Polling Fix (Android 16)
 
+🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
+> [!WARNING]  
+> **POTENTIAL BOOTLOOP ISSUE:** > A recent background Google Play System Update (January 2026) has introduced SELinux policy changes that may cause this thermal fix to trigger a bootloop. I am currently investigating the conflict and will update this repository with a fix as soon as possible. Use with extreme caution for now.
+🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
+
 ## 📢 DISCLAIMER 
 I am very much a hobby dev, and new to rooting android devices. I made this repository to document my findings as I am learning. Please only implement the module if you know what you are doing, and always keep backups in case of something not working as intended.
  
